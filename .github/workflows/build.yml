@@ -1,0 +1,43 @@
+name: build
+on: [pull_request, push, workflow_dispatch]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v6
+      - name: setup jdk
+        uses: actions/setup-java@v5
+        with:
+          java-version: '25'
+          distribution: 'microsoft'
+      - name: setup gradle (Fallback, falls gradlew fehlt)
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '9.8.2'
+      - name: find project folder (folder containing settings.gradle)
+        run: |
+          SETTINGS=$(find . -name settings.gradle -type f -not -path './.git/*' | head -n 1)
+          if [ -z "$SETTINGS" ]; then
+            echo "settings.gradle nicht gefunden - das Projekt wurde nicht ins Repo hochgeladen. Repository-Inhalt:"
+            find . -maxdepth 3 -not -path './.git/*'
+            exit 1
+          fi
+          DIR=$(dirname "$SETTINGS")
+          echo "PROJECT_DIR=$DIR" >> "$GITHUB_ENV"
+          if [ -f "$DIR/gradlew" ]; then
+            chmod +x "$DIR/gradlew"
+            echo "GRADLE_CMD=./gradlew" >> "$GITHUB_ENV"
+          else
+            echo "gradlew fehlt, nutze installiertes Gradle"
+            echo "GRADLE_CMD=gradle" >> "$GITHUB_ENV"
+          fi
+      - name: build
+        run: ${{ env.GRADLE_CMD }} build
+        working-directory: ${{ env.PROJECT_DIR }}
+      - name: capture build artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: elemennnt
+          path: ${{ env.PROJECT_DIR }}/build/libs/
