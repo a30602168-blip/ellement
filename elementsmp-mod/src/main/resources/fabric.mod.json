@@ -1,0 +1,27 @@
+{
+	"schemaVersion": 1,
+	"id": "elementsmp",
+	"version": "${version}",
+	"name": "Elements SMP",
+	"description": "Server-side Elements SMP mod: every player randomly receives one of six elements (Wind, Sand, Lava, Water, Earth, Void) with unique abilities. Clients do not need the mod.",
+	"authors": [
+		"Elements SMP"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/elementsmp/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"com.example.Elementsmp"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.20.1",
+		"minecraft": "~1.21.11",
+		"java": ">=21",
+		"fabric-api": "*"
+	}
+}
